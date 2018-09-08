@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.NumberFormat;
 
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -18,10 +19,25 @@ public class UnboundedKnapsack2 {
     protected int  []  maxIt;  // maximum number of items
     protected int  []    iIt;  // current indexes of items
     protected int  [] bestAm;  // best amounts
+    
+    // the main() function:
+    public static void main(String[] args) throws InvalidFormatException, IOException {
+    	String fpath = "C:/Users/David1234/Desktop/Nostale Vendetta Mall List";
+    	String ext = ".xlsx";
+    	OPCPackage pkg = OPCPackage.open(new File(fpath+ext));
+	    XSSFWorkbook wb = new XSSFWorkbook(pkg);
+	    XSSFSheet sheet = wb.getSheetAt(0);
+	    // exclude first row
+	    int len = sheet.getPhysicalNumberOfRows()-1;
+        UnboundedKnapsack2 k1 = new UnboundedKnapsack2(fpath + ext,1,len/3);
+        UnboundedKnapsack2 k2 = new UnboundedKnapsack2(fpath + ext,len/3+1, len/3*2);
+        UnboundedKnapsack2 k3 = new UnboundedKnapsack2(fpath + ext,len/3*2+1, len);
+        wb.close();
+    } // main()
  
-    public UnboundedKnapsack2(String file) {
+    public UnboundedKnapsack2(String file, int from, int to) {
     	try {
-			setUp(file);
+			setUp(file,from,to);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -32,15 +48,18 @@ public class UnboundedKnapsack2 {
     	bestAm = new int[n];
         // initializing:
         for (int i = 0; i < n; i++) {
+        	System.out.println("Hello from: " + items[i].getWeight() + "at: " + i);
             maxIt [i] = (int)(sack.getWeight() / items[i].getWeight());
         } // for (i)
         // print out the amount of max # of each item we can buy if the sack only contains multiple copies of 1 item
         /*for(int i = 0; i < maxIt.length; i++){
         	System.out.println(items[i] + ":" + maxIt[i]);
         }*/
-        // calc the solution:
-        calcWithRecursion(0);
- 
+    }
+    
+    public void run(){
+    	// calc the solution:
+        calcWithRecursion(0); 
         // Print out the solution:
         NumberFormat nf = NumberFormat.getInstance();
         System.out.println("Maximum value achievable is: " + best.getValue());
@@ -50,7 +69,6 @@ public class UnboundedKnapsack2 {
         }
         System.out.println();
         System.out.println("The weight to carry is: " + nf.format(best.getWeight()));
- 
     }
  
     // calculation the solution with recursion method
@@ -88,21 +106,11 @@ public class UnboundedKnapsack2 {
             } // else
         } // for (i)
     } // calcWithRecursion()
- 
-    // the main() function:
-    public static void main(String[] args) {
-    	String fpath = "C:/Users/David1234/Desktop/Nostale Vendetta Mall List";
-    	String ext = ".xlsx";
-    	long start = System.nanoTime();
-    	System.out.println(start);
-        new UnboundedKnapsack2(fpath + ext);
-        System.out.println("Time elapsed: " + (System.nanoTime()- start));
-    } // main()
     
     /*
      * Set up the array
      */
-	public void setUp(String file) throws IOException {
+	public void setUp(String file,int from, int to) throws IOException {
 		XSSFWorkbook wb = null;
 		try {
 			OPCPackage pkg = OPCPackage.open(new File(file));
@@ -110,54 +118,41 @@ public class UnboundedKnapsack2 {
 		    XSSFSheet sheet = wb.getSheetAt(0);
 		    XSSFRow row;
 		    XSSFCell cell;
-
-		    int rows; // No of rows
-		    rows = sheet.getPhysicalNumberOfRows();
 		    
-		    int cols = 0; // No of columns
-		    int tmp = 0;
+		    // get row
+		    int cols = sheet.getRow(1).getPhysicalNumberOfCells();
 		    
 		    // 1 less than rows since we ignored 1st row (row 0)
-		    this.items = new Item2[rows-1];
-		    // always ignore first row
-		    
-		    // This trick ensures that we get the data properly even if it doesn't start from first few rows
-		    // Figure out the maximum # of cells (cols) that we will need to read table (since some rows will
-		    // have different number of cells, so we take the largest)
-		    for(int i = 1; i < 10 || i < rows; i++) {
-		        row = sheet.getRow(i);
-		        if(row != null) {
-		            tmp = row.getPhysicalNumberOfCells();
-		            if(tmp > cols) cols = tmp;
-		        }
-		    }
-		    for(int r = 1; r < rows; r++) {
+		    System.out.println("Math: " + (to-from+1) + "with: " + from + "," + to);
+		    this.items = new Item2[to-from+1];
+		    System.out.println("items.length: " + items.length);
+		    for(int r = from; r <= to; r++) {
 		        row = sheet.getRow(r);
 		        if(row != null) {
-		        	items[r-1] = new Item2();
+		        	items[items.length-(1+(to-r))] = new Item2();
 		            for(int c = 0; c < cols; c++) {
 		                cell = row.getCell((short)c);
 		                if(cell != null) {
 		                	// name
 		                	if(c == 0)
-		                		items[r-1].setName(cell.getStringCellValue());
+		                		items[items.length-(1+(to-r))].setName(cell.getStringCellValue());
 		                	else if(c==1)
-		                		items[r-1].setWeight((int)cell.getNumericCellValue());
+		                		items[items.length-(1+(to-r))].setWeight((int)cell.getNumericCellValue());
 		                	/*// price in market
 		                	else if(c==2)
-		                		items[r-1].setValue((int)cell.getNumericCellValue());*/
+		                		items[rows-(1+(to-r))].setValue((int)cell.getNumericCellValue());*/
 		                	/* Priority */
 		                	else if (c==3)
-		                		items[r-1].setPriority((int)cell.getNumericCellValue());
+		                		items[items.length-(1+(to-r))].setPriority((int)cell.getNumericCellValue());
 		                	/* Current resell price*/
 		                	else if (c==4)
-		                		items[r-1].setValue((int)cell.getNumericCellValue());
+		                		items[items.length-(1+(to-r))].setValue((int)cell.getNumericCellValue());
 		                	else if (c > 4)
 		                		System.err.println("Error! Check excel file");
 		                }
 		            }
-		            /*System.out.println("Row: " + r + " " + items[r-1].getName() + " " + 
-		            		items[r-1].getWeight() + " " + items[r-1].getValue());*/
+		            System.out.println("Row: " + r + " " + items[items.length-(1+(to-r))].getName() + " " + 
+		            		items[items.length-(1+(to-r))].getWeight() + " " + items[items.length-(1+(to-r))].getValue());
 		        }
 		    }
 		} catch(Exception e) {
