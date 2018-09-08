@@ -35,6 +35,26 @@ public class UnboundedKnapsack2 {
         UnboundedKnapsack2 k4 = new UnboundedKnapsack2(fpath + ext,len/6*3+1, len/6*4);
         UnboundedKnapsack2 k5 = new UnboundedKnapsack2(fpath + ext,len/6*4+1, len/6*5);
         UnboundedKnapsack2 k6 = new UnboundedKnapsack2(fpath + ext,len/6*5+1, len);
+        UnboundedKnapsack2 [] knapsacks = {k1,k2,k3,k4,k5,k6};
+        int threads_num = 6;
+        // spin up threads_num threads
+        Thread [] threads = new Thread[threads_num];
+        for(int i = 0; i < threads_num; i++){
+        	int num = i;
+        	threads[i] = new Thread(() -> {
+        		knapsacks[num].start();
+        	});
+        	threads[i].start();        		
+        }
+        // rejoin
+        for(int i = 0; i < threads_num; i++){
+        	try {
+				threads[i].join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+        }
+        System.out.println("Exitting");
         wb.close();
     } // main()
  
@@ -58,7 +78,7 @@ public class UnboundedKnapsack2 {
         }*/
     }
     
-    public void run(){
+    public void start(){
     	// calc the solution:
         calcWithRecursion(0); 
         // Print out the solution:
@@ -77,7 +97,7 @@ public class UnboundedKnapsack2 {
     public void calcWithRecursion(int item) {    	
         for (int i = 0; i <= maxIt[item]; i++) {
             iIt[item] = i;
-            if(globalCount == 70) return;
+            if(globalCount == 200) return;
             if (item < n-1) {
                 calcWithRecursion(item+1);
             } else {
