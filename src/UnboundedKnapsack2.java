@@ -13,7 +13,7 @@ public class UnboundedKnapsack2 {
 	protected int globalCount = 0;
     protected Item2 [] items;
     protected int n; // the number of items
-    protected Item2 sack = new Item2("sack", 0, 15000);
+    protected Item2 sack = new Item2("sack", 0, 8500);
     protected Item2  best = new Item2("best", 0, 0);
     protected int  []  maxIt;  // maximum number of items
     protected int  []    iIt;  // current indexes of items
@@ -26,6 +26,7 @@ public class UnboundedKnapsack2 {
 			e.printStackTrace();
 		}
     	n = items.length;
+    	System.out.println(n);
     	maxIt = new int[n];
     	iIt = new int[n];
     	bestAm = new int[n];
@@ -54,22 +55,23 @@ public class UnboundedKnapsack2 {
  
     // calculation the solution with recursion method
     // item : the number of item in the "items" array
-    public void calcWithRecursion(int item) {
-    	
+    public void calcWithRecursion(int item) {    	
         for (int i = 0; i <= maxIt[item]; i++) {
             iIt[item] = i;
-            if(globalCount == 33) return;
+            if(globalCount == 70) return;
             if (item < n-1) {
                 calcWithRecursion(item+1);
             } else {
+            	//long start = System.nanoTime();
                 int    currVal = 0;   // current value
                 int currWei = 0; // current weight
                 for (int j = 0; j < n; j++) {
                 	// constraints
                 	// make it realistic, we can't sell more than 1 stacks quickly
-                	if(iIt[j] > 99) continue;
-                	if(iIt[j] > 3 && items[j].getValue() > 10000000) continue;
-                	if(iIt[j] > 5 && items[j].getValue() > 5000000) continue;
+                	if(iIt[j] > 99*2) continue;
+                	if(iIt[j] > 10 && items[j].getPriority() == 3) continue;
+                	if(iIt[j] > 30 && items[j].getPriority() == 2) continue;
+                	
                     currVal += iIt[j] * items[j].getValue();
                     currWei += iIt[j] * items[j].getWeight();
                 }
@@ -82,15 +84,19 @@ public class UnboundedKnapsack2 {
                     for (int j = 0; j < n; j++) bestAm[j] = iIt[j];
                     System.out.println("Global: " + globalCount + "," + best.getValue());
                 } // if (...)
+                //System.out.println("base case time: " + (System.nanoTime() - start));
             } // else
         } // for (i)
     } // calcWithRecursion()
  
     // the main() function:
     public static void main(String[] args) {
-    	String fpath = "C:/Users/David1234/Desktop/Nostale Vendetta Mall Item List";
+    	String fpath = "C:/Users/David1234/Desktop/Nostale Vendetta Mall List";
     	String ext = ".xlsx";
+    	long start = System.nanoTime();
+    	System.out.println(start);
         new UnboundedKnapsack2(fpath + ext);
+        System.out.println("Time elapsed: " + (System.nanoTime()- start));
     } // main()
     
     /*
@@ -137,10 +143,17 @@ public class UnboundedKnapsack2 {
 		                		items[r-1].setName(cell.getStringCellValue());
 		                	else if(c==1)
 		                		items[r-1].setWeight((int)cell.getNumericCellValue());
+		                	/*// price in market
 		                	else if(c==2)
+		                		items[r-1].setValue((int)cell.getNumericCellValue());*/
+		                	/* Priority */
+		                	else if (c==3)
+		                		items[r-1].setPriority((int)cell.getNumericCellValue());
+		                	/* Current resell price*/
+		                	else if (c==4)
 		                		items[r-1].setValue((int)cell.getNumericCellValue());
-		                	else
-		                		System.out.println("Unexpected column! Review Sheet!");
+		                	else if (c > 4)
+		                		System.err.println("Error! Check excel file");
 		                }
 		            }
 		            /*System.out.println("Row: " + r + " " + items[r-1].getName() + " " + 
