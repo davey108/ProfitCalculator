@@ -29,9 +29,12 @@ public class UnboundedKnapsack2 {
 	    XSSFSheet sheet = wb.getSheetAt(0);
 	    // exclude first row
 	    int len = sheet.getPhysicalNumberOfRows()-1;
-        UnboundedKnapsack2 k1 = new UnboundedKnapsack2(fpath + ext,1,len/3);
-        UnboundedKnapsack2 k2 = new UnboundedKnapsack2(fpath + ext,len/3+1, len/3*2);
-        UnboundedKnapsack2 k3 = new UnboundedKnapsack2(fpath + ext,len/3*2+1, len);
+        UnboundedKnapsack2 k1 = new UnboundedKnapsack2(fpath + ext,1,len/6);
+        UnboundedKnapsack2 k2 = new UnboundedKnapsack2(fpath + ext,len/6+1, len/6*2);
+        UnboundedKnapsack2 k3 = new UnboundedKnapsack2(fpath + ext,len/6*2+1, len/6*3);
+        UnboundedKnapsack2 k4 = new UnboundedKnapsack2(fpath + ext,len/6*3+1, len/6*4);
+        UnboundedKnapsack2 k5 = new UnboundedKnapsack2(fpath + ext,len/6*4+1, len/6*5);
+        UnboundedKnapsack2 k6 = new UnboundedKnapsack2(fpath + ext,len/6*5+1, len);
         wb.close();
     } // main()
  
@@ -42,13 +45,11 @@ public class UnboundedKnapsack2 {
 			e.printStackTrace();
 		}
     	n = items.length;
-    	System.out.println(n);
     	maxIt = new int[n];
     	iIt = new int[n];
     	bestAm = new int[n];
         // initializing:
         for (int i = 0; i < n; i++) {
-        	System.out.println("Hello from: " + items[i].getWeight() + "at: " + i);
             maxIt [i] = (int)(sack.getWeight() / items[i].getWeight());
         } // for (i)
         // print out the amount of max # of each item we can buy if the sack only contains multiple copies of 1 item
@@ -123,9 +124,7 @@ public class UnboundedKnapsack2 {
 		    int cols = sheet.getRow(1).getPhysicalNumberOfCells();
 		    
 		    // 1 less than rows since we ignored 1st row (row 0)
-		    System.out.println("Math: " + (to-from+1) + "with: " + from + "," + to);
 		    this.items = new Item2[to-from+1];
-		    System.out.println("items.length: " + items.length);
 		    for(int r = from; r <= to; r++) {
 		        row = sheet.getRow(r);
 		        if(row != null) {
