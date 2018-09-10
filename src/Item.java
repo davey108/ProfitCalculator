@@ -3,20 +3,21 @@
  * Profit = inGamePrice
  */
 public class Item {
-	private int mallPrice;
+	private int weight;
 	private String name;
-	private int inGamePrice;
+	private int value;
+	private int priority;
 	
 	/*public Item(String name, int mallPrice, int inGamePrice){
 		this.name = name;
 		this.mallPrice = mallPrice;
 		this.inGamePrice = inGamePrice;
 	}*/
-	public int getMallPrice(){
-		return this.mallPrice;
+	public int getWeight(){
+		return this.weight;
 	}
-	public void setMallPrice(int mallPrice){
-		this.mallPrice = mallPrice;
+	public void setWeight(int mallPrice){
+		this.weight = mallPrice;
 	}
 	public String getName(){
 		return this.name;
@@ -24,11 +25,17 @@ public class Item {
 	public void setName(String name){
 		this.name = name;
 	}
-	public int getGamePrice(){
-		return this.inGamePrice;
+	public int getValue(){
+		return this.value;
 	}
-	public void setGamePrice(int newGamePrice){
-		this.inGamePrice = newGamePrice;
+	public void setValue(int newGamePrice){
+		this.value = newGamePrice;
+	}
+	public int getPriority() {
+		return priority;
+	}
+	public void setPriority(int priority) {
+		this.priority = priority;
 	}
 	
 }
